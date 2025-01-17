@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Styled Calorie Tracker</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Calorie Tracker</h1>
+
+    <!-- Input Section -->
+    <div class="input-section">
+      <button id="scan-btn" class="btn primary-btn">
+        <i class="fas fa-qrcode"></i> Scan QR Code
+      </button>
+      <p>OR</p>
+      <input type="text" id="food-input" class="input-box" placeholder="Enter a food item">
+      <button id="submit-btn" class="btn secondary-btn">
+        <i class="fas fa-search"></i> Submit
+      </button>
+    </div>
+
+    <!-- Result Section -->
+    <div id="result" class="card">
+      <p>Calorie info will appear here...</p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
