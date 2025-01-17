@@ -15,9 +15,15 @@ body {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
   }
   
+  h2 {
+    margin-top: 20px;
+    font-size: 1.8rem;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  }
+  
   /* Container */
   .container {
-    max-width: 500px;
+    max-width: 700px;
     margin: 50px auto;
     padding: 20px;
     background: rgba(0, 0, 0, 0.7);
@@ -67,6 +73,16 @@ body {
     background: #1e7e34;
   }
   
+  /* QR Code Section */
+  #qr-code-section, #scanner-section {
+    margin: 20px 0;
+  }
+  
+  #qr-code, #scanner {
+    margin: 10px auto;
+    text-align: center;
+  }
+  
   /* Card */
   .card {
     margin-top: 20px;
@@ -76,5 +92,6 @@ body {
     border-radius: 5px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   }
+  
   
   

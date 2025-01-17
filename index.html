@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Styled Calorie Tracker</title>
+  <title>Calorie Tracker</title>
   <link rel="stylesheet" href="style.css">
   <!-- FontAwesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- html5-qrcode for QR code scanning -->
+  <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
 </head>
 <body>
   <div class="container">
@@ -24,6 +26,19 @@
       </button>
     </div>
 
+    <!-- QR Code Section -->
+    <div id="qr-code-section">
+      <h2>Generated QR Code</h2>
+      <div id="qr-code"></div>
+    </div>
+
+    <!-- Scanner Section -->
+    <div id="scanner-section">
+      <h2>QR Code Scanner</h2>
+      <div id="scanner" style="width: 300px; margin: 10px auto;"></div>
+      <button id="start-scan-btn" class="btn primary-btn">Start Scanning</button>
+    </div>
+
     <!-- Result Section -->
     <div id="result" class="card">
       <p>Calorie info will appear here...</p>
@@ -33,4 +48,6 @@
   <script src="script.js"></script>
 </body>
 </html>
+
+
 

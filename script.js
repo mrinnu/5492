@@ -1,39 +1,53 @@
-// Select elements
 const scanBtn = document.getElementById("scan-btn");
 const foodInput = document.getElementById("food-input");
 const submitBtn = document.getElementById("submit-btn");
 const resultDiv = document.getElementById("result");
+const qrCodeContainer = document.getElementById("qr-code");
+const scanner = new Html5Qrcode("scanner");
 
-// Simulate QR Scanning
-scanBtn.addEventListener("click", () => {
-  const simulatedQRData = "apple"; // Replace with real QR scanning logic
-  fetchCalorieInfo(simulatedQRData);
-});
+// Function to generate QR Code
+function generateQRCode(data) {
+  qrCodeContainer.innerHTML = ""; // Clear previous QR code
+  new QRCode(qrCodeContainer, {
+    text: data,
+    width: 200,
+    height: 200,
+  });
+}
 
-// Handle Manual Input
-submitBtn.addEventListener("click", () => {
-  const foodItem = foodInput.value.trim().toLowerCase();
-  if (!foodItem) {
-    resultDiv.innerHTML = `<p style="color: red;">Please enter a food item!</p>`;
-    return;
-  }
-  fetchCalorieInfo(foodItem);
+// Example: Generate a QR code for "apple"
+generateQRCode("apple");
+
+// Start QR Code Scanner
+document.getElementById("start-scan-btn").addEventListener("click", () => {
+  scanner.start(
+    { facingMode: "environment" }, // Rear-facing camera
+    { fps: 10, qrbox: 250 },
+    (decodedText) => {
+      alert(`Scanned: ${decodedText}`);
+      fetchCalorieInfo(decodedText);
+      scanner.stop();
+    },
+    (errorMessage) => {
+      console.error(errorMessage);
+    }
+  );
 });
 
 // Fetch calorie info from backend
 function fetchCalorieInfo(foodItem) {
   fetch(`http://localhost:3000/calories?food=${foodItem}`)
     .then((response) => {
-      if (!response.ok) {
-        throw new Error("Food not found");
-      }
+      if (!response.ok) throw new Error("Food not found");
       return response.json();
     })
     .then((data) => {
       resultDiv.innerHTML = `<p>Calories in ${foodItem}: ${data.calories} kcal per 100g</p>`;
     })
-    .catch((error) => {
+    .catch(() => {
       resultDiv.innerHTML = `<p style="color: red;">Calorie information for "${foodItem}" not found.</p>`;
     });
 }
+
+
 
