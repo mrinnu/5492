@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calories Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-image: url('https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6); /* Slightly darker overlay for better contrast */
+            z-index: 0;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 1rem;
+            transition: transform 0.2s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Progress bar styles */
+        .progress-bar {
+            background: rgba(30, 58, 138, 0.9) !important;
+            height: 8px !important;
+            border-radius: 9999px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-bg {
+            background: rgba(255, 255, 255, 0.2) !important;
+            height: 8px !important;
+            border-radius: 9999px;
+        }
+
+        /* Breakdown item styles */
+        .breakdown-item {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            margin-bottom: 0.5rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .breakdown-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Text styles */
+        .text-shadow {
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Button styles */
+        .btn-primary {
+            background: rgba(30, 58, 138, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            transition: all 0.2s ease;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: rgba(30, 58, 138, 1);
+            transform: translateY(-2px);
+        }
+
+        /* Chart container */
+        .chart-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <h1 class="text-3xl font-bold text-white mb-6 text-shadow">Calories Details</h1>
+            
+            <!-- Counter Display -->
+            <div class="glass-card p-6 mb-6">
+                <div class="text-center">
+                    <h2 class="text-2xl font-bold text-white text-shadow mb-2">Total Calories</h2>
+                    <div class="text-5xl font-bold text-white text-shadow mt-2" id="calories-counter">0</div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mt-6">
+                    <div class="glass-card p-4">
+                        <div class="text-white text-shadow opacity-90">Total Dishes</div>
+                        <div class="text-2xl font-semibold text-white text-shadow" id="total-dishes">0</div>
+                    </div>
+                    <div class="glass-card p-4">
+                        <div class="text-white text-shadow opacity-90">Last Updated</div>
+                        <div class="text-sm font-semibold text-white text-shadow" id="last-updated">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graph Display -->
+            <div class="glass-card p-6 mb-6">
+                <h2 class="text-xl font-semibold text-white text-shadow mb-4">Calories by Dish</h2>
+                <div class="chart-container">
+                    <canvas id="calories-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Detailed Breakdown -->
+            <div class="glass-card p-6 mb-6">
+                <h2 class="text-xl font-semibold text-white text-shadow mb-4">Detailed Breakdown</h2>
+                <div id="calories-breakdown" class="space-y-3">
+                    <!-- Breakdown items will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="flex gap-2">
+                <button onclick="window.location.href='summary.html'" 
+                    class="btn-primary text-white px-4 py-2 rounded-md text-sm font-medium">
+                    Back to Summary
+                </button>
+                <button onclick="window.location.href='index.html'" 
+                    class="btn-primary text-white px-4 py-2 rounded-md text-sm font-medium">
+                    Back to Menu
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add this at the start of your script
+        // Check login status when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            
+            if (!currentUser) {
+                // User is not logged in, redirect to login page
+                window.location.href = 'Auth/login.html';
+                return;
+            }
+
+            // If user is logged in, proceed with updating the calorie details
+            updateCalorieDetails();
+        });
+
+        // Chart configuration with gradient bars
+        const ctx = document.getElementById('calories-chart').getContext('2d');
+        
+        // Create gradient for bars
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(99, 102, 241, 0.9)');    // Indigo
+        gradient.addColorStop(1, 'rgba(30, 58, 138, 0.9)');     // Dark Blue
+
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: 'white',
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        },
+                        padding: 20
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)',
+                        lineWidth: 1
+                    },
+                    ticks: {
+                        color: 'white',
+                        font: {
+                            weight: 'bold'
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)',
+                        lineWidth: 1
+                    },
+                    ticks: {
+                        color: 'white',
+                        font: {
+                            weight: 'bold'
+                        }
+                    }
+                }
+            },
+            elements: {
+                bar: {
+                    borderRadius: 8,
+                    borderWidth: 1.5,
+                    borderColor: 'rgba(255, 255, 255, 0.4)',
+                    backgroundColor: gradient
+                }
+            },
+            animation: {
+                duration: 2000,
+                easing: 'easeInOutQuart'
+            }
+        };
+
+        // Initialize chart with actual dish names
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Margherita Pizza', 'Caesar Salad', 'Chicken Burger', 'Pasta Alfredo'],
+                datasets: [{
+                    label: 'Calories',
+                    data: [266, 440, 550, 380],
+                    backgroundColor: gradient,
+                    borderColor: 'rgba(255, 255, 255, 0.4)',
+                    borderWidth: 1.5,
+                    borderRadius: 8,
+                    hoverBackgroundColor: 'rgba(99, 102, 241, 1)',
+                    hoverBorderColor: 'rgba(255, 255, 255, 0.6)',
+                    hoverBorderWidth: 2
+                }]
+            },
+            options: chartOptions
+        });
+
+        // Breakdown item template
+        function updateBreakdown(dishName, calories, percentage) {
+            return `
+                <div class="breakdown-item">
+                    <div class="flex items-center">
+                        <div class="flex-1">
+                            <div class="flex justify-between mb-2">
+                                <span class="text-white text-shadow font-semibold">${dishName}</span>
+                                <span class="text-white text-shadow">${calories} cal (${percentage}%)</span>
+                            </div>
+                            <div class="progress-bg">
+                                <div class="progress-bar" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Function to update counters and breakdown
+        function updateCalorieDetails() {
+            const dishes = [
+                { name: 'Margherita Pizza', calories: 266 },
+                { name: 'Caesar Salad', calories: 440 },
+                { name: 'Chicken Burger', calories: 550 },
+                { name: 'Pasta Alfredo', calories: 380 }
+            ];
+
+            // Update total dishes
+            document.getElementById('total-dishes').textContent = dishes.length;
+
+            // Calculate total calories
+            const totalCalories = dishes.reduce((sum, dish) => sum + dish.calories, 0);
+            document.getElementById('calories-counter').textContent = totalCalories;
+
+            // Update last updated time
+            const now = new Date();
+            document.getElementById('last-updated').textContent = now.toLocaleString();
+
+            // Update breakdown
+            const breakdownDiv = document.getElementById('calories-breakdown');
+            breakdownDiv.innerHTML = ''; // Clear existing items
+
+            dishes.forEach(dish => {
+                const percentage = Math.round((dish.calories / totalCalories) * 100);
+                breakdownDiv.innerHTML += updateBreakdown(dish.name, dish.calories, percentage);
+            });
+        }
+
+        // Call the update function when page loads
+        document.addEventListener('DOMContentLoaded', updateCalorieDetails);
+    </script>
+</body>
+</html> 

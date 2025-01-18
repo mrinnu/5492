@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Summary</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --glass-light: rgba(255, 255, 255, 0.2);
+            --glass-dark: rgba(0, 0, 0, 0.3);
+            --text-light: #ffffff;
+            --text-dark: #f3f4f6;
+            --border-light: rgba(255, 255, 255, 0.3);
+            --border-dark: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-image: url('https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-light);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 0;
+        }
+
+        .theme-light {
+            --bg-glass: var(--glass-light);
+            --text-primary: var(--text-light);
+            --border-color: var(--border-light);
+        }
+
+        .theme-dark {
+            --bg-glass: var(--glass-dark);
+            --text-primary: var(--text-dark);
+            --border-color: var(--border-dark);
+        }
+
+        .nav-container {
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Text styles */
+        h1, h2, h3, .text-white {
+            color: #ffffff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Navigation links */
+        .nav-link, 
+        .nav-container a {
+            color: #ffffff !important;
+            opacity: 0.9;
+            transition: opacity 0.2s ease;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-link:hover, 
+        .nav-container a:hover {
+            opacity: 1;
+        }
+
+        /* Button styling */
+        .btn-primary {
+            background: rgba(79, 70, 229, 0.8) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background: rgba(67, 56, 202, 0.9) !important;
+            transform: translateY(-2px);
+        }
+
+        /* Content wrapper */
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Summary table styling */
+        .summary-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 0.5rem;
+        }
+
+        .summary-table th {
+            color: #ffffff;
+            text-align: left;
+            padding: 1rem;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .summary-table td {
+            color: #ffffff;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .summary-table tr:hover td {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Total calories section */
+        .total-calories {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #ffffff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 400px) {
+            .nav-brand {
+                font-size: 1rem !important;
+            }
+            .content-container {
+                padding: 0.5rem !important;
+                margin: 0.25rem !important;
+            }
+            h1 { font-size: 1.5rem !important; }
+            h2 { font-size: 1.25rem !important; }
+            p { font-size: 0.875rem !important; }
+        }
+
+        /* Form and content styling */
+        #order-summary {
+            color: #ffffff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .bg-white {
+            background: var(--bg-glass) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .bg-gray-50 {
+            background: rgba(255, 255, 255, 0.05) !important;
+        }
+
+        .text-gray-900,
+        .text-gray-800,
+        .text-gray-700,
+        .text-gray-600,
+        .text-gray-500 {
+            color: #ffffff !important;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .border-gray-200 {
+            border-color: rgba(255, 255, 255, 0.4) !important;
+        }
+
+        /* Progress bar styling */
+        .bg-indigo-500 {
+            background-color: rgba(30, 58, 138, 0.8) !important;
+        }
+
+        .bg-gray-200 {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* Button styling */
+        .bg-indigo-500,
+        .bg-indigo-600 {
+            background-color: rgba(30, 58, 138, 0.8) !important;
+        }
+
+        .bg-indigo-500:hover,
+        .bg-indigo-600:hover {
+            background-color: rgba(30, 58, 138, 0.95) !important;
+        }
+
+        .bg-red-500 {
+            background-color: rgba(239, 68, 68, 0.8) !important;
+        }
+
+        .bg-red-500:hover {
+            background-color: rgba(220, 38, 38, 0.9) !important;
+        }
+
+        /* List styling */
+        .list-disc {
+            list-style-type: disc;
+            list-style-position: inside;
+            color: #ffffff;
+        }
+
+        /* Order items */
+        .order-item {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            margin-bottom: 0.5rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            transition: transform 0.2s ease;
+        }
+
+        .order-item:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Calories breakdown */
+        #calories-breakdown {
+            color: #ffffff;
+        }
+
+        .calories-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.25rem;
+            overflow: hidden;
+        }
+
+        .calories-progress {
+            background: rgba(30, 58, 138, 0.8) !important;
+            height: 0.5rem;
+            transition: width 0.3s ease;
+        }
+
+        /* Total section */
+        #total-calories {
+            color: rgba(147, 197, 253, 1);
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Links */
+        .text-indigo-600 {
+            color: rgba(147, 197, 253, 1) !important;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .text-indigo-600:hover {
+            color: rgba(191, 219, 254, 1) !important;
+        }
+
+        /* Shadow and border adjustments */
+        .shadow,
+        .shadow-sm {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .overflow-hidden {
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        /* Updated border colors */
+        .border-gray-200 {
+            border-color: rgba(255, 255, 255, 0.4) !important;
+        }
+
+        /* Card and container borders */
+        .card, 
+        .content-container,
+        .order-item {
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        /* Updated blue colors to darker shades */
+        .bg-indigo-500,
+        .bg-indigo-600,
+        .btn-primary {
+            background-color: rgba(30, 58, 138, 0.8) !important;
+        }
+
+        .bg-indigo-500:hover,
+        .bg-indigo-600:hover,
+        .btn-primary:hover {
+            background-color: rgba(30, 58, 138, 0.95) !important;
+        }
+
+        /* Progress bars */
+        .calories-progress,
+        .bg-indigo-500 {
+            background: rgba(30, 58, 138, 0.8) !important;
+        }
+
+        /* Links and text accents */
+        .text-indigo-600 {
+            color: rgba(147, 197, 253, 1) !important;
+        }
+
+        .text-indigo-600:hover {
+            color: rgba(191, 219, 254, 1) !important;
+        }
+
+        /* Order items hover effect */
+        .order-item:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Total calories color */
+        #total-calories {
+            color: rgba(147, 197, 253, 1);
+        }
+
+        /* Navigation and section borders */
+        .nav-container {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .border-t.border-gray-200 {
+            border-top-color: rgba(255, 255, 255, 0.4) !important;
+        }
+
+        /* Button borders */
+        button {
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        /* Glass effect containers */
+        .bg-white,
+        .bg-gray-50 {
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">Order Summary</h1>
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg p-4">
+            <!-- Orders Section -->
+            <div id="order-summary"></div>
+            
+            <!-- Calories Summary Section -->
+            <div class="mt-6 pt-4 border-t border-gray-200">
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-3">Calories Summary</h2>
+                    
+                    <!-- Per-Dish Calories -->
+                    <div id="calories-breakdown" class="space-y-2 mb-4">
+                        <!-- Will be filled by JavaScript -->
+                    </div>
+                    
+                    <!-- Total Calories with Visual Separator -->
+                    <div class="flex items-center pt-3 border-t border-gray-200">
+                        <div class="flex-1">
+                            <div class="text-lg font-semibold text-gray-900">
+                                Total Calories: <span id="total-calories" class="text-indigo-600">0</span>
+                            </div>
+                            <div class="mt-2">
+                                <a href="javascript:void(0)" 
+                                   onclick="navigateToCalories()"
+                                   class="inline-flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                                    View Detailed Calories Report
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-4 flex gap-2">
+                <button onclick="window.location.href='index.html'" 
+                    class="bg-indigo-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-600">
+                    Back to Menu
+                </button>
+                <button onclick="clearAllOrders()" 
+                    class="bg-red-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-600">
+                    Clear All Orders
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            const orders = JSON.parse(decodeURIComponent(params.get('orders')));
+            
+            const summaryDiv = document.getElementById('order-summary');
+            const caloriesBreakdown = document.getElementById('calories-breakdown');
+            let totalCalories = 0;
+            let dishCaloriesTotal = {};
+            
+            if (orders && orders.length > 0) {
+                orders.forEach((order, index) => {
+                    // Calculate total items in this order
+                    const totalItemsInOrder = Object.values(order.items)
+                        .reduce((total, item) => total + (item.count * item.quantity), 0);
+                    
+                    // Calculate calories for this order
+                    const orderCalories = order.calories * totalItemsInOrder;
+                    totalCalories += orderCalories;
+
+                    // Track calories per dish type
+                    if (!dishCaloriesTotal[order.dishName]) {
+                        dishCaloriesTotal[order.dishName] = 0;
+                    }
+                    dishCaloriesTotal[order.dishName] += orderCalories;
+
+                    let dishHtml = `
+                        <div id="order-${index}" class="mb-4 p-4 border border-gray-200 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <h2 class="text-xl font-semibold text-gray-800">
+                                    ${order.dishName} (Order #${index + 1})
+                                </h2>
+                                <div class="flex items-center gap-4">
+                                    <span class="text-sm text-gray-600">
+                                        Calories: ${orderCalories}
+                                    </span>
+                                    <button onclick="removeOrder(${index})" 
+                                        class="bg-red-500 text-white px-2 py-1 rounded-md text-sm font-medium hover:bg-red-600">
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                            <ul class="list-disc list-inside space-y-1">
+                    `;
+
+                    for (const [itemName, itemData] of Object.entries(order.items)) {
+                        if (itemData.count > 0) {
+                            const totalItems = itemData.count * itemData.quantity;
+                            const itemCalories = order.calories * totalItems;
+                            dishHtml += `
+                                <li class="text-gray-700">
+                                    ${itemName}: ${itemData.count} orders 
+                                    <span class="text-sm text-gray-500">
+                                        (${itemData.quantity} items per order = ${totalItems} total items)
+                                        | Calories: ${itemCalories}
+                                    </span>
+                                </li>
+                            `;
+                        }
+                    }
+
+                    dishHtml += `
+                            </ul>
+                        </div>
+                    `;
+
+                    summaryDiv.innerHTML += dishHtml;
+                });
+
+                // Display calories breakdown with percentage bars
+                for (const [dishName, calories] of Object.entries(dishCaloriesTotal)) {
+                    const percentage = ((calories / totalCalories) * 100).toFixed(1);
+                    caloriesBreakdown.innerHTML += `
+                        <div class="relative pt-1">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-700">${dishName}</span>
+                                <span class="text-gray-600">${calories} cal (${percentage}%)</span>
+                            </div>
+                            <div class="overflow-hidden h-2 text-xs flex rounded bg-gray-200">
+                                <div class="bg-indigo-500 rounded" 
+                                     style="width: ${percentage}%">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                document.getElementById('total-calories').textContent = totalCalories;
+
+                // Store calories data in localStorage
+                const caloriesData = {
+                    totalCalories: totalCalories,
+                    dishCalories: dishCaloriesTotal,
+                    timestamp: new Date().toISOString()
+                };
+                localStorage.setItem('caloriesData', JSON.stringify(caloriesData));
+
+            } else {
+                summaryDiv.innerHTML = `
+                    <p class="text-gray-700">No items ordered yet.</p>
+                `;
+                caloriesBreakdown.innerHTML = `
+                    <p class="text-gray-700">No calories to display.</p>
+                `;
+            }
+        };
+
+        function navigateToCalories() {
+            const caloriesData = localStorage.getItem('caloriesData');
+            if (caloriesData) {
+                window.location.href = 'ShowCal.html';
+            } else {
+                alert('No calories data available');
+            }
+        }
+
+        function removeOrder(index) {
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            orders.splice(index, 1);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            
+            const dataStr = encodeURIComponent(JSON.stringify(orders));
+            window.location.href = `summary.html?orders=${dataStr}`;
+        }
+
+        function clearAllOrders() {
+            localStorage.removeItem('orders');
+            localStorage.removeItem('caloriesData');
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>

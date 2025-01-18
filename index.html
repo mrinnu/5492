@@ -1,53 +1,517 @@
-<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calorie Tracker</title>
-  <link rel="stylesheet" href="style.css">
-  <!-- FontAwesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <!-- html5-qrcode for QR code scanning -->
-  <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
-</head>
-<body>
-  <div class="container">
-    <h1>Calorie Tracker</h1>
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Dish List
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet"/>
+  <style>
+   :root {
+        --glass-light: rgba(255, 255, 255, 0.2);
+        --glass-dark: rgba(0, 0, 0, 0.3);
+        --text-light: #ffffff;
+        --text-dark: #f3f4f6;
+        --border-light: rgba(255, 255, 255, 0.3);
+        --border-dark: rgba(255, 255, 255, 0.1);
+    }
 
-    <!-- Input Section -->
-    <div class="input-section">
-      <button id="scan-btn" class="btn primary-btn">
-        <i class="fas fa-qrcode"></i> Scan QR Code
+    body {
+        background-image: url('https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        color: var(--text-light);
+        min-height: 100vh;
+    }
+
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 0;
+    }
+
+    .theme-light {
+        --bg-glass: var(--glass-light);
+        --text-primary: var(--text-light);
+        --border-color: var(--border-light);
+    }
+
+    .theme-dark {
+        --bg-glass: var(--glass-dark);
+        --text-primary: var(--text-dark);
+        --border-color: var(--border-dark);
+    }
+
+    .nav-container {
+        background: var(--bg-glass);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .card {
+        background: var(--bg-glass);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--border-color);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+    }
+
+    .theme-toggle {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px;
+        border-radius: 50%;
+        background: var(--bg-glass);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        z-index: 1000;
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+    }
+
+    .theme-toggle:hover {
+        transform: scale(1.1);
+    }
+
+    /* Navigation text colors */
+    .nav-link, 
+    .nav-container a {
+        color: #ffffff !important;
+        opacity: 0.9;
+        transition: opacity 0.2s ease;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-link:hover, 
+    .nav-container a:hover {
+        opacity: 1;
+    }
+
+    .nav-link.active {
+        opacity: 1;
+        border-bottom-color: var(--text-primary) !important;
+    }
+
+    /* Button styling */
+    .btn-primary {
+        background: rgba(79, 70, 229, 0.8) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+        background: rgba(67, 56, 202, 0.9) !important;
+        transform: translateY(-2px);
+    }
+
+    /* Content container */
+    .content-wrapper {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Dish items styling */
+    .dish-item {
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .dish-item:last-child {
+        border-bottom: none;
+    }
+
+    /* Counter buttons alignment and styling */
+    .counter-btn {
+        background: rgba(79, 70, 229, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+        width: 32px;  /* Fixed width for consistency */
+        height: 32px; /* Fixed height for consistency */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .counter-btn:hover {
+        background: rgba(67, 56, 202, 0.9);
+    }
+
+    .counter-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 120px; /* Fixed width for alignment */
+        justify-content: flex-end;
+    }
+
+    .total-count {
+        min-width: 40px; /* Fixed width for alignment */
+        text-align: center;
+    }
+
+    /* Updated text colors for better readability */
+    .dish-name {
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 1.25rem;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .dish-calories {
+        color: #ffffff;
+        font-weight: 500;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .item-name {
+        color: #ffffff;
+        font-weight: 500;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .item-quantity {
+        color: rgba(255, 255, 255, 0.9);
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .total-count {
+        color: #ffffff;
+        font-weight: 600;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    h1, h2, h3 {
+        color: #ffffff;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Sign In button specific styling */
+    .sign-in-btn {
+        background: rgba(79, 70, 229, 0.8);
+        color: white;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .sign-in-btn:hover {
+        background: rgba(67, 56, 202, 0.9);
+    }
+
+    /* Mobile menu styling */
+    #mobile-menu a {
+        color: white !important;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    #mobile-menu a:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+ </head>
+ <body class="theme-light">
+  <nav class="nav-container relative z-10">
+   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16">
+     <div class="flex">
+      <div class="flex-shrink-0 flex items-center">
+       <img alt="Logo placeholder image" class="h-8 w-8" height="32" src="https://storage.googleapis.com/a1aa/image/Aq1M5OabLvIlHhg9hzlfAEPYP3GFy9xkeEUnO4pQVvsG7ZGUA.jpg" width="32"/>
+      </div>
+      <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+       <a class="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-indigo-500 text-sm font-medium" href="#">
+        Home
+       </a>
+       <a class="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium" href="about.html">
+        About
+       </a>
+       <a class="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium" href="contact.html">
+        Contact
+       </a>
+       <a class="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium" href="ShowCal.html">
+        CalorieTracker
+       </a>
+       <a class="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium" href="summary.html">
+        Summary
+       </a>
+      </div>
+     </div>
+     <div class="hidden sm:ml-6 sm:flex sm:items-center">
+      <button class="sign-in-btn px-3 py-2 rounded-md text-sm font-medium">
+       <a href="Auth/login.html">Sign In</a>
       </button>
-      <p>OR</p>
-      <input type="text" id="food-input" class="input-box" placeholder="Enter a food item">
-      <button id="submit-btn" class="btn secondary-btn">
-        <i class="fas fa-search"></i> Submit
+     </div>
+     <div class="-mr-2 flex items-center sm:hidden">
+      <button aria-controls="mobile-menu" aria-expanded="false" class="bg-gray-100 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" onclick="toggleMobileMenu()" type="button">
+       <span class="sr-only">
+        Open main menu
+       </span>
+       <i class="fas fa-bars">
+       </i>
       </button>
+     </div>
     </div>
-
-    <!-- QR Code Section -->
-    <div id="qr-code-section">
-      <h2>Generated QR Code</h2>
-      <div id="qr-code"></div>
+   </div>
+   <div class="sm:hidden hidden" id="mobile-menu">
+    <div class="pt-2 pb-3 space-y-1">
+     <a class="bg-indigo-50 border-indigo-500 text-indigo-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium" href="#">
+      Home
+     </a>
+     <a class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium" href="about.html">
+      About
+     </a>
+     <a class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium" href="contact.html">
+      Contact
+     </a>
+     <a class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium" href="ShowCal.html">
+      CalorieTracker
+     </a>
+     <a class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium" href="summary.html">
+      Summary
+     </a>
     </div>
-
-    <!-- Scanner Section -->
-    <div id="scanner-section">
-      <h2>QR Code Scanner</h2>
-      <div id="scanner" style="width: 300px; margin: 10px auto;"></div>
-      <button id="start-scan-btn" class="btn primary-btn">Start Scanning</button>
-    </div>
-
-    <!-- Result Section -->
-    <div id="result" class="card">
-      <p>Calorie info will appear here...</p>
-    </div>
+   </div>
+  </nav>
+  <div class="content-wrapper max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+   <h1 class="text-3xl font-bold mb-4">
+    Dish List
+   </h1>
+   <div class="card p-4 rounded-lg shadow-sm" id="parent-data">
+   </div>
+   <div class="mt-4 card p-4 rounded-lg">
+    <h2 class="text-xl font-semibold mb-2">
+     Total Items Added: <span id="total-items">0</span>
+    </h2>
+    <button class="btn-primary mt-4 px-4 py-2 rounded-md text-sm font-medium" 
+            onclick="navigateToSummary()">
+     View Summary
+    </button>
+   </div>
   </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+   <i class="fas fa-moon dark:fas fa-sun"></i>
+  </button>
+  <script>
+   const parentDiv = document.getElementById('parent-data');
+        const url = "https://test123-dbd7c-default-rtdb.firebaseio.com/dishes.json";
+        let dishCounts = {};
+        let itemCounts = {};
+        let totalAddedItems = 0;
+        let dishCalories = {};  // Store calories for each dish
 
-  <script src="script.js"></script>
-</body>
+        // Fetching the data from Firebase
+        fetch(url)
+            .then(response => response.json()) // Parse JSON response
+            .then(data => {              
+              console.log(data.dishes);  // Log data for debugging
+              DisplayData(data);  // Call the function to display the data
+            })  
+            .catch(error => {
+                console.error("Error fetching data:", error);
+            });
+
+        // Function to display data
+        function DisplayData(dishes) {
+            dishes.forEach(dish => {
+                if (dish && dish.dishName) {
+                    dishCounts[dish.dishName] = 0;
+                    itemCounts[dish.dishName] = {};
+                    dishCalories[dish.dishName] = dish.calories || 0;  // Store calories
+                    
+                    const dishDiv = document.createElement("div");
+                    dishDiv.classList.add("mb-4", "p-4", "border", "border-gray-200", "rounded-lg");
+                    dishDiv.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <h2 class="dish-name">${dish.dishName}</h2>
+                            <span class="dish-calories">Calories: ${dish.calories || 0}</span>
+                        </div>
+                        <ul class="list-disc list-inside">
+                            ${dish.items
+                                .filter(item => item !== null)
+                                .map(item => {
+                                    itemCounts[dish.dishName][item.name] = {
+                                        count: 0,
+                                        quantity: item.quantity
+                                    };
+                                    return `
+                                        <li class="flex justify-between items-center mb-2">
+                                            <span class="item-name flex-grow">${item.name} 
+                                                <span class="item-quantity">
+                                                    (${item.quantity} per order)
+                                                </span>
+                                            </span>
+                                            <div class="counter-container">
+                                                <button class="counter-btn rounded-md" 
+                                                    onclick="decrementItem('${dish.dishName}', '${item.name}')">-</button>
+                                                <span id="count-${dish.dishName}-${item.name}" 
+                                                    class="total-count">0</span>
+                                                <button class="counter-btn rounded-md" 
+                                                    onclick="incrementItem('${dish.dishName}', '${item.name}')">+</button>
+                                            </div>
+                                            <span class="total-count ml-4" id="total-${dish.dishName}-${item.name}">
+                                                Total: 0
+                                            </span>
+                                        </li>
+                                    `;
+                                })
+                                .join("")}
+                        </ul>
+                        <div class="mt-4 text-right">
+                            <button id="add-${dish.dishName}" 
+                                onclick="addDish('${dish.dishName}')"
+                                class="btn-primary px-4 py-2 rounded-md text-sm font-medium opacity-50 cursor-not-allowed"
+                                disabled>
+                                Add ${dish.dishName}
+                            </button>
+                        </div>
+                    `;
+                    parentDiv.appendChild(dishDiv);
+                }
+            });
+        }
+
+        function incrementItem(dishName, itemName) {
+            itemCounts[dishName][itemName].count++;
+            dishCounts[dishName]++;
+            updateItemDisplay(dishName, itemName);
+            updateAddButton(dishName);
+            updateTotalItems();
+        }
+
+        function decrementItem(dishName, itemName) {
+            if (itemCounts[dishName][itemName].count > 0) {
+                itemCounts[dishName][itemName].count--;
+                dishCounts[dishName]--;
+                updateItemDisplay(dishName, itemName);
+                updateAddButton(dishName);
+                updateTotalItems();
+            }
+        }
+
+        function updateItemDisplay(dishName, itemName) {
+            const count = itemCounts[dishName][itemName].count;
+            const quantity = itemCounts[dishName][itemName].quantity;
+            const totalItems = count * quantity;
+            
+            document.getElementById(`count-${dishName}-${itemName}`).textContent = count;
+            document.getElementById(`total-${dishName}-${itemName}`).textContent = 
+                `Total: ${totalItems} items`;
+        }
+
+        function updateAddButton(dishName) {
+            const addButton = document.getElementById(`add-${dishName}`);
+            const hasItems = dishCounts[dishName] > 0;
+            
+            addButton.disabled = !hasItems;
+            addButton.classList.toggle('opacity-50', !hasItems);
+            addButton.classList.toggle('cursor-not-allowed', !hasItems);
+            addButton.classList.toggle('hover:bg-indigo-600', hasItems);
+        }
+
+        function addDish(dishName) {
+            // Store the selected items in localStorage
+            const currentOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+            
+            // Calculate items being added from this dish
+            let dishTotalItems = 0;
+            for (const [itemName, itemData] of Object.entries(itemCounts[dishName])) {
+                dishTotalItems += itemData.count * itemData.quantity;
+            }
+            totalAddedItems += dishTotalItems;
+            
+            const order = {
+                dishName: dishName,
+                items: itemCounts[dishName],
+                calories: dishCalories[dishName]  // Add calories to order
+            };
+            currentOrders.push(order);
+            localStorage.setItem('orders', JSON.stringify(currentOrders));
+
+            // Reset counts for this dish
+            Object.keys(itemCounts[dishName]).forEach(itemName => {
+                itemCounts[dishName][itemName].count = 0;
+                updateItemDisplay(dishName, itemName);
+            });
+            dishCounts[dishName] = 0;
+            updateAddButton(dishName);
+            
+            document.getElementById('total-items').textContent = totalAddedItems;
+
+            alert(`${dishName} added to your order!`);
+        }
+
+        function navigateToSummary() {
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const dataStr = encodeURIComponent(JSON.stringify(orders));
+            window.location.href = `summary.html?orders=${dataStr}`;
+        }
+
+        // Function to toggle mobile menu
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        function updateTotalItems() {
+            totalItems = 0;
+            for (const [dishName, items] of Object.entries(itemCounts)) {
+                for (const [itemName, itemData] of Object.entries(items)) {
+                    totalItems += itemData.count * itemData.quantity;
+                }
+            }
+            // Show both current selection and total added items
+            document.getElementById('total-items').textContent = totalItems + totalAddedItems;
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.querySelector('.theme-toggle i');
+            
+            if (body.classList.contains('theme-light')) {
+                body.classList.remove('theme-light');
+                body.classList.add('theme-dark');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.remove('theme-dark');
+                body.classList.add('theme-light');
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Set initial theme based on localStorage or system preference
+        window.onload = function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.body.classList.remove('theme-light');
+                document.body.classList.add('theme-dark');
+                document.querySelector('.theme-toggle i').classList.add('fa-sun');
+            }
+
+            // ... your existing onload code ...
+        }
+  </script>
+ </body>
 </html>
-
-
-

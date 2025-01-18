@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Food Calorie Counter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .food-bg {
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            animation: bgSlideshow 12s linear infinite;
+        }
+        .food-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        @keyframes bgSlideshow {
+            0%, 16.66% {
+                background-image: url('https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg');
+            }
+            16.67%, 33.33% {
+                background-image: url('https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg');
+            }
+            33.34%, 50% {
+                background-image: url('https://images.pexels.com/photos/1639562/pexels-photo-1639562.jpeg');
+            }
+            50.01%, 66.66% {
+                background-image: url('https://images.pexels.com/photos/674574/pexels-photo-674574.jpeg');
+            }
+            66.67%, 83.33% {
+                background-image: url('https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg');
+            }
+            83.34%, 100% {
+                background-image: url('https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg');
+            }
+        }
+        .form-container {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 0.5s ease forwards;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container input {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #000;
+            font-weight: 500;
+        }
+
+        .form-container input::placeholder {
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        .form-container input:focus {
+            background: white;
+            border-color: #4F46E5;
+        }
+
+        .form-container label {
+            color: white;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-container h2 {
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-container p {
+            color: white;
+            font-weight: 500;
+        }
+
+        .submit-btn button {
+            background: #4F46E5;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn button:hover {
+            transform: translateY(-2px);
+            background: #4338CA;
+        }
+
+        .password-toggle {
+            color: #4F46E5;
+        }
+
+        .error-message {
+            color: #EF4444;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+        }
+
+        .form-container a {
+            color: white;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
+        .form-container a:hover {
+            color: #4F46E5;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .food-grid {
+            transform: translateY(-20px);
+            opacity: 0;
+            animation: slideDown 0.5s ease forwards;
+            animation-delay: 0.3s;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .form-input {
+            transform: translateX(-20px);
+            opacity: 0;
+            animation: slideRight 0.5s ease forwards;
+        }
+
+        @keyframes slideRight {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .form-input:nth-child(1) { animation-delay: 0.4s; }
+        .form-input:nth-child(2) { animation-delay: 0.5s; }
+
+        .submit-btn {
+            transform: scale(0.9);
+            opacity: 0;
+            animation: popIn 0.5s ease forwards;
+            animation-delay: 0.6s;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-25%);
+            cursor: pointer;
+            color: #4F46E5;
+            z-index: 10;
+            background: transparent;
+            padding: 5px;
+        }
+
+        .password-container input {
+            padding-right: 40px !important;
+        }
+    </style>
+</head>
+<body class="food-bg min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8 relative">
+        <!-- Food Images Grid -->
+        <div class="grid grid-cols-3 gap-4 mb-8 food-grid">
+            <img src="https://images.pexels.com/photos/1640771/pexels-photo-1640771.jpeg" alt="Healthy Salad" class="w-full h-24 object-cover rounded-lg shadow-lg hover:scale-105 transition-transform duration-300">
+            <img src="https://images.pexels.com/photos/1640772/pexels-photo-1640772.jpeg" alt="Fruit Bowl" class="w-full h-24 object-cover rounded-lg shadow-lg hover:scale-105 transition-transform duration-300">
+            <img src="https://images.pexels.com/photos/1640773/pexels-photo-1640773.jpeg" alt="Protein Meal" class="w-full h-24 object-cover rounded-lg shadow-lg hover:scale-105 transition-transform duration-300">
+        </div>
+
+        <!-- Login Form -->
+        <div class="form-container rounded-xl shadow-2xl p-8">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-white">
+                    Welcome Back! 🍽️
+                </h2>
+                <p class="mt-2 text-sm text-white">
+                    Track your calories with ease
+                </p>
+            </div>
+            <form id="loginForm" class="space-y-6" onsubmit="return handleLogin(event)">
+                <div class="space-y-5">
+                    <div class="form-input">
+                        <label for="email" class="block text-sm font-medium text-white">
+                            Email Address
+                        </label>
+                        <input id="email" name="email" type="email" required
+                            class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                            placeholder="Enter your email">
+                        <span id="emailError" class="error-message hidden"></span>
+                    </div>
+                    <div class="form-input">
+                        <label for="password" class="block text-sm font-medium text-white">
+                            Password
+                        </label>
+                        <div class="password-container">
+                            <input id="password" name="password" type="password" required
+                                class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                                placeholder="Enter your password">
+                            <i class="fas fa-eye password-toggle" onclick="togglePassword()"></i>
+                        </div>
+                        <span id="passwordError" class="error-message hidden"></span>
+                    </div>
+                </div>
+
+                <div class="submit-btn">
+                    <button type="submit"
+                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200">
+                        Sign in
+                    </button>
+                </div>
+            </form>
+
+            <p class="mt-6 text-center text-sm text-white">
+                Don't have an account?
+                <a href="signup.html" class="font-medium text-white hover:text-indigo-200 underline">
+                    Sign up
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user was redirected from ShowCal
+            if (document.referrer.includes('ShowCal.html')) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'text-center mb-4 text-white text-shadow';
+                messageDiv.innerHTML = 'Please login to view your calorie details';
+                
+                // Insert the message before the login form
+                const form = document.querySelector('form');
+                form.parentNode.insertBefore(messageDiv, form);
+            }
+        });
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            // Get users from localStorage
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (!email || !password) {
+                alert('Please fill in all fields');
+                return false;
+            }
+
+            if (!user) {
+                alert('Invalid email or password! Please try again.');
+                document.getElementById('password').value = ''; // Clear password field
+                return false;
+            }
+
+            // Login successful
+            localStorage.setItem('currentUser', JSON.stringify({ 
+                name: user.name, 
+                email: user.email 
+            }));
+            
+            alert('Login successful! Welcome back, ' + user.name);
+            window.location.href = '../index.html';
+            return false;
+        }
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.querySelector('.password-toggle');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
+</body>
+</html>
