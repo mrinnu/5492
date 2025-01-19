@@ -353,6 +353,67 @@
         .bg-gray-50 {
             border: 1px solid rgba(255, 255, 255, 0.4);
         }
+
+        .qr-section {
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: transparent;
+        }
+
+        .qr-button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 10px;
+        }
+
+        .qr-button:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .qr-button i {
+            margin-right: 8px;
+        }
+
+        #qrcode {
+            margin: 15px auto;
+            padding: 15px;
+            background: transparent;
+            border-radius: 12px;
+            width: fit-content;
+            transition: all 0.3s ease;
+        }
+
+        #qrcode img {
+            display: block;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .scan-message {
+            margin-top: 15px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        #qrcode:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn {
+            margin: 10px;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -404,8 +465,24 @@
                     Clear All Orders
                 </button>
             </div>
+
+            <!-- Add this where you want the QR code button and display -->
+            <div class="container">
+                <div class="qr-section">
+                    <button onclick="generateQR()" class="btn btn-primary qr-button">
+                        <i class="fas fa-qrcode"></i> Generate QR Code
+                    </button>
+                    <div id="qrcode"></div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- Add these scripts before closing </body> tag -->
+    <!-- First, add jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Then add qrcode.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script>
         window.onload = function() {
@@ -536,6 +613,29 @@
             localStorage.removeItem('orders');
             localStorage.removeItem('caloriesData');
             window.location.reload();
+        }
+
+        function generateQR() {
+            const qrcodeDiv = document.getElementById("qrcode");
+            qrcodeDiv.innerHTML = "";
+            
+            // Direct URL to showcal
+            const showcalUrl = "https://curious-griffin-b6aade.netlify.app/showcal";
+            
+            new QRCode(qrcodeDiv, {
+                text: showcalUrl,
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            // Add scan instruction message
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'scan-message';
+            messageDiv.innerHTML = 'Scan to view Showcal page';
+            qrcodeDiv.appendChild(messageDiv);
         }
     </script>
 </body>

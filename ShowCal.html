@@ -6,6 +6,9 @@
     <title>Calories Details</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body {
             background-image: url('https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg');
@@ -99,6 +102,63 @@
             border-radius: 0.5rem;
             padding: 1rem;
         }
+
+        .qr-section {
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: transparent;
+        }
+
+        .qr-button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 10px;
+        }
+
+        .qr-button:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .qr-button i {
+            margin-right: 8px;
+        }
+
+        #qrcode {
+            margin: 15px auto;
+            padding: 15px;
+            background: transparent;
+            border-radius: 12px;
+            width: fit-content;
+            transition: all 0.3s ease;
+        }
+
+        #qrcode img {
+            display: block;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .scan-message {
+            margin-top: 15px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        #qrcode:hover {
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -151,6 +211,15 @@
                     Back to Menu
                 </button>
             </div>
+
+            <!-- <div class="container">
+                <div class="qr-section">
+                    <button onclick="generateQR()" class="btn btn-primary qr-button">
+                        <i class="fas fa-qrcode"></i> Generate QR Code
+                    </button>
+                    <div id="qrcode"></div>
+                </div>
+            </div> -->
         </div>
     </div>
 
@@ -305,6 +374,28 @@
 
         // Call the update function when page loads
         document.addEventListener('DOMContentLoaded', updateCalorieDetails);
+
+        function generateQR() {
+            const qrcodeDiv = document.getElementById("qrcode");
+            qrcodeDiv.innerHTML = "";
+            
+            // Get current URL (showcal page URL)
+            const currentUrl = window.location.href;
+            
+            new QRCode(qrcodeDiv, {
+                text: currentUrl,
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'scan-message';
+            messageDiv.innerHTML = 'Scan to share this page';
+            qrcodeDiv.appendChild(messageDiv);
+        }
     </script>
 </body>
 </html> 
